@@ -6,9 +6,11 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
+import org.apache.shiro.crypto.hash.Md5Hash;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.realm.SimpleAccountRealm;
 import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.util.ByteSource;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,7 +28,7 @@ public class CustomRealm  extends AuthorizingRealm {
     Map<String,String> useMap = new HashMap<String, String>(16);
 
     {
-        useMap.put("Mark","123456");
+        useMap.put("Mark","d40fdd323f5322ff34a41f026f35cf20");
 
         super.setName("customRealm");
 
@@ -40,14 +42,13 @@ public class CustomRealm  extends AuthorizingRealm {
 
        //从数据库中或者缓存中获取角色数据
        Set<String> roles = getRolesByUserName(username);
-
        Set<String> permissions = getPermissionsByUsername(username);
 
         SimpleAuthorizationInfo simpleAuthorizationInfo = new SimpleAuthorizationInfo();
         simpleAuthorizationInfo.setStringPermissions(permissions);
         simpleAuthorizationInfo.setRoles(roles);
 
-        return null;
+        return simpleAuthorizationInfo;
     }
 
     private Set<String> getPermissionsByUsername(String username) {
@@ -85,7 +86,8 @@ public class CustomRealm  extends AuthorizingRealm {
         }
         SimpleAuthenticationInfo authenticationInfo = new SimpleAuthenticationInfo
                 ("Mark",password,"customRealm");
-
+        //加盐
+        authenticationInfo.setCredentialsSalt(ByteSource.Util.bytes("Mark"));
 
         return authenticationInfo;
     }
@@ -98,7 +100,11 @@ public class CustomRealm  extends AuthorizingRealm {
     */
     private String getPasswordByUserName(String username) {
         //读数据库
-
         return useMap.get(username);
+    }
+
+    public static void main(String[] args) {
+        Md5Hash md5Hash = new Md5Hash("1234567","Mark");
+        System.out.println(md5Hash.toString());
     }
 }

@@ -58,12 +58,6 @@ public class CustomRealm  extends AuthorizingRealm {
         return sets;
     }
 
-    /**
-    *@Description: 模拟数据中获取数据
-    *@Param:
-    *@Author: luweibin
-    *@date: 2019/3/8
-    */
     private Set<String> getRolesByUserName(String username) {
         Set<String> sets = new HashSet<String>();
         sets.add("admin");
